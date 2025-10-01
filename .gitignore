@@ -28,6 +28,12 @@ go.work
 .env.local
 .env.production
 
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+identifier.sqlite
+
 # Logs
 *.log
 
