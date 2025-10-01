@@ -2,7 +2,6 @@ package models
 
 import (
 	"REST_API/db"
-	"database/sql"
 	"time"
 )
 
@@ -23,12 +22,7 @@ func (e *Event) Save() error {
 	if err != nil {
 		return err
 	}
-	defer func(stmt *sql.Stmt) {
-		err := stmt.Close()
-		if err != nil {
-
-		}
-	}(stmt)
+	defer func() { _ = stmt.Close() }()
 
 	result, err := stmt.Exec(e.Name, e.Description, e.Location, e.DateTime, e.UserID)
 	if err != nil {
@@ -53,12 +47,7 @@ func (e *Event) Update() error {
 	if err != nil {
 		return err
 	}
-	defer func(stmt *sql.Stmt) {
-		err := stmt.Close()
-		if err != nil {
-
-		}
-	}(stmt)
+	defer func() { _ = stmt.Close() }()
 
 	_, err = stmt.Exec(e.Name, e.Description, e.Location, e.DateTime, e.UserID, e.ID)
 	if err != nil {
@@ -74,12 +63,7 @@ func (e *Event) Delete() error {
 	if err != nil {
 		return err
 	}
-	defer func(stmt *sql.Stmt) {
-		err := stmt.Close()
-		if err != nil {
-
-		}
-	}(stmt)
+	defer func() { _ = stmt.Close() }()
 
 	_, err = stmt.Exec(e.ID)
 	if err != nil {
@@ -95,12 +79,7 @@ func GetAllEvents() ([]Event, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer func(rows *sql.Rows) {
-		err := rows.Close()
-		if err != nil {
-
-		}
-	}(rows)
+	defer func() { _ = rows.Close() }()
 
 	var events []Event
 
