@@ -1,15 +1,17 @@
 # REST API - Event Management System
 
-A comprehensive and efficient REST API built with Go and the Gin framework for managing events. This project provides full CRUD operations for events with persistent SQLite database storage.
+A comprehensive and efficient REST API built with Go and the Gin framework for managing events with user authentication. This project provides full CRUD operations for events and secure user registration/login with persistent SQLite database storage.
 
 ## 🚀 Features
 
+- **User Authentication**: Secure user registration and login with bcrypt password hashing
 - **Complete CRUD Operations**: Create, Read, Update, and Delete events
-- **Database Persistence**: SQLite database for data storage
+- **Database Persistence**: SQLite database with relational schema and foreign keys
 - **RESTful Design**: Clean REST API endpoints following best practices
-- **Structured Architecture**: Organized codebase with separate packages for routes, models, and database
+- **Structured Architecture**: Organized codebase with separate packages for routes, models, database, and cryptography
 - **JSON API**: RESTful API with JSON request/response format
 - **Input Validation**: Built-in validation for required fields
+- **Password Security**: bcrypt hashing for secure password storage
 - **Error Handling**: Comprehensive error handling and HTTP status codes
 - **Database Connection Pooling**: Optimized database connections
 - **Lightweight**: Fast and efficient using the Gin web framework
@@ -19,12 +21,71 @@ A comprehensive and efficient REST API built with Go and the Gin framework for m
 - **Language**: Go 1.25
 - **Web Framework**: [Gin](https://github.com/gin-gonic/gin) v1.11.0
 - **Database**: SQLite 3 with [go-sqlite3](https://github.com/mattn/go-sqlite3) driver
+- **Password Hashing**: [bcrypt](https://golang.org/x/crypto/bcrypt) for secure password storage
 - **API Format**: JSON REST API
 - **Architecture**: Clean separation of concerns with packages
 
 ## 📋 API Endpoints
 
-### Get All Events
+### User Authentication
+
+#### User Registration
+- **Endpoint**: `POST /signup`
+- **Content-Type**: `application/json`
+- **Description**: Register a new user with email and password
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "your_secure_password"
+}
+```
+
+**Response (Success):**
+```json
+{
+  "message": "User created successfully"
+}
+```
+
+**Response (Error):**
+```json
+{
+  "error": "Invalid user data"
+}
+```
+
+#### User Login
+- **Endpoint**: `POST /login`
+- **Content-Type**: `application/json`
+- **Description**: Authenticate user with email and password
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "your_secure_password"
+}
+```
+
+**Response (Success):**
+```json
+{
+  "message": "User logged in successfully"
+}
+```
+
+**Response (Error):**
+```json
+{
+  "error": "Invalid credentials"
+}
+```
+
+### Event Management
+
+#### Get All Events
 - **Endpoint**: `GET /events`
 - **Description**: Retrieves all events from the database
 
@@ -42,7 +103,7 @@ A comprehensive and efficient REST API built with Go and the Gin framework for m
 ]
 ```
 
-### Get Event by ID
+#### Get Event by ID
 - **Endpoint**: `GET /events/{id}`
 - **Description**: Retrieves a specific event by its ID
 
@@ -58,7 +119,7 @@ A comprehensive and efficient REST API built with Go and the Gin framework for m
 }
 ```
 
-### Create Event
+#### Create Event
 - **Endpoint**: `POST /events`
 - **Content-Type**: `application/json`
 - **Description**: Creates a new event and stores it in the database
@@ -85,7 +146,7 @@ A comprehensive and efficient REST API built with Go and the Gin framework for m
 }
 ```
 
-### Update Event
+#### Update Event
 - **Endpoint**: `PUT /events/{id}`
 - **Content-Type**: `application/json`
 - **Description**: Updates an existing event by ID
@@ -107,7 +168,7 @@ A comprehensive and efficient REST API built with Go and the Gin framework for m
 }
 ```
 
-### Delete Event
+#### Delete Event
 - **Endpoint**: `DELETE /events/{id}`
 - **Description**: Deletes an event by ID
 
@@ -152,6 +213,8 @@ The project includes comprehensive HTTP test files in the `api-test/` directory:
 - `get-events.http` - Test getting all events and specific events by ID
 - `update-events.http` - Test event updates
 - `delete-events.http` - Test event deletion
+- `create-user.http` - Test user registration
+- `login.http` - Test user login
 
 You can use these with tools like:
 - JetBrains HTTP Client (built into GoLand/IntelliJ IDEA)
@@ -160,6 +223,26 @@ You can use these with tools like:
 - cURL
 
 #### Example cURL commands:
+
+**User Registration:**
+```bash
+curl -X POST http://localhost:8080/signup \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "secure_password"
+  }'
+```
+
+**User Login:**
+```bash
+curl -X POST http://localhost:8080/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "secure_password"
+  }'
+```
 
 **Create an event:**
 ```bash
@@ -208,15 +291,21 @@ REST_API/
 ├── db/                  # Database package
 │   └── db.go            # Database initialization and setup
 ├── models/              # Data models and business logic
-│   └── event.go         # Event model with CRUD operations
+│   ├── event.go         # Event model with CRUD operations
+│   └── user.go          # User model with authentication
 ├── routes/              # Route handlers
 │   ├── events.go        # Event-related route handlers
+│   ├── users.go         # User authentication route handlers
 │   └── routes.go        # Route registration
+├── crypto/              # Cryptography package
+│   └── hash.go          # Password hashing and validation
 ├── api-test/            # HTTP test files
-│   ├── create-event.http # POST request tests
-│   ├── get-events.http   # GET request tests
-│   ├── update-events.http # PUT request tests
-│   └── delete-events.http # DELETE request tests
+│   ├── create-event.http # Event POST request tests
+│   ├── get-events.http   # Event GET request tests
+│   ├── update-events.http # Event PUT request tests
+│   ├── delete-events.http # Event DELETE request tests
+│   ├── create-user.http  # User registration tests
+│   └── login.http        # User login tests
 ├── api.db               # SQLite database file (auto-generated)
 ├── go.mod               # Go module dependencies
 ├── go.sum               # Dependency checksums
@@ -224,7 +313,24 @@ REST_API/
 └── README.md            # Project documentation
 ```
 
-## 🎯 Event Model
+## 🎯 Data Models
+
+### User Model
+
+The User model handles authentication and user management:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | int64 | No | Auto-generated primary key (SQLite AUTOINCREMENT) |
+| `email` | string | Yes | User email address (unique) |
+| `password` | string | Yes | bcrypt hashed password |
+
+**Database Operations:**
+- **Registration**: `Save()` method creates new users with hashed passwords
+- **Authentication**: `ValidateCredentials()` method verifies login credentials
+- **Security**: All passwords are hashed using bcrypt before storage
+
+### Event Model
 
 The Event model includes the following fields stored in SQLite database:
 
@@ -235,19 +341,33 @@ The Event model includes the following fields stored in SQLite database:
 | `description` | string | Yes | Event description |
 | `location` | string | Yes | Event location |
 | `date_time` | time.Time | Yes | Event date and time (SQLite DATETIME) |
-| `user_id` | int | No | Auto-assigned user ID |
+| `user_id` | int | No | Foreign key reference to users table |
 
-### Database Operations
-
-The Event model supports full CRUD operations:
+**Database Operations:**
 - **Create**: `Save()` method inserts new events into database
 - **Read**: `GetAllEvents()` and `GetEventByID()` functions for querying
 - **Update**: `Update()` method modifies existing events
 - **Delete**: `Delete()` method removes events from database
 
+### Database Schema
+
+The application uses SQLite with the following tables:
+
+**Users Table:**
+- Primary key: `id` (INTEGER AUTOINCREMENT)
+- Unique constraint on `email`
+- Password stored as bcrypt hash
+
+**Events Table:**
+- Primary key: `id` (INTEGER AUTOINCREMENT) 
+- Foreign key: `user_id` references `users(id)`
+- Proper relational integrity with foreign key constraints
+
 ## 🔮 Future Enhancements
 
-- [ ] User authentication and authorization
+- [x] ~~User authentication and authorization~~ ✅ **Completed**
+- [ ] JWT token-based authentication
+- [ ] User-specific event access control
 - [ ] Event filtering and search capabilities
 - [ ] Pagination for large event lists
 - [ ] Input sanitization and advanced validation
@@ -259,6 +379,8 @@ The Event model supports full CRUD operations:
 - [ ] Logging middleware
 - [ ] Rate limiting
 - [ ] CORS support for web frontends
+- [ ] Password reset functionality
+- [ ] Email verification for user registration
 
 ## 🤝 Contributing
 
