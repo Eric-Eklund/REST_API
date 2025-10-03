@@ -18,6 +18,8 @@ A comprehensive and efficient REST API built with Go and the Gin framework for m
 - **Token Security**: JWT tokens with expiration and validation
 - **Error Handling**: Comprehensive error handling and HTTP status codes
 - **Database Connection Pooling**: Optimized database connections
+- **Comprehensive Testing**: Full test suite with unit and integration tests
+- **Test Utilities**: Reusable test helpers for consistent testing across components
 - **Lightweight**: Fast and efficient using the Gin web framework
 
 ## 🛠️ Tech Stack
@@ -267,6 +269,51 @@ Authorization: YOUR_JWT_TOKEN_HERE
 
 The server will start on `http://localhost:8080`
 
+## 🧪 Testing
+
+This project includes a comprehensive test suite covering all major functionality:
+
+### Running Tests
+
+```bash
+# Run all tests
+go test ./...
+
+# Run tests with verbose output
+go test -v ./...
+
+# Run specific test package
+go test ./routes
+go test ./models
+
+# Run tests with coverage
+go test -cover ./...
+```
+
+### Test Structure
+
+The test suite is organized with reusable utilities and comprehensive coverage:
+
+- **`routes/test_utils.go`**: Shared test utilities including:
+  - `SetupTestDB()`: In-memory SQLite database setup with sample data
+  - `SetupTestRouter()`: Gin router configuration for testing
+  - `GenerateTestJWT()`: JWT token generation for authenticated tests
+  - `GetTestUsers()`: Standard test user credentials
+
+- **Unit Tests**: Individual component testing for models and utilities
+- **Integration Tests**: End-to-end API testing with database interactions
+- **Authentication Tests**: JWT token validation and user authentication flows
+- **Registration Tests**: Event registration/unregistration functionality with helper functions
+
+### Test Coverage
+
+- **User Authentication**: Registration, login, JWT validation
+- **Event Management**: CRUD operations, validation, error handling
+- **Event Registration**: User registration/unregistration for events
+- **Database Operations**: Model methods, foreign key constraints, data integrity
+- **API Endpoints**: HTTP status codes, JSON responses, authentication middleware
+- **Error Scenarios**: Invalid inputs, unauthorized access, non-existent resources
+
 ### Testing the API
 
 The project includes comprehensive HTTP test files in the `api-test/` directory:
@@ -370,12 +417,18 @@ REST_API/
 │   └── db.go            # Database initialization and setup
 ├── models/              # Data models and business logic
 │   ├── event.go         # Event model with CRUD operations
-│   └── user.go          # User model with authentication
+│   ├── event_test.go    # Event model unit tests
+│   ├── user.go          # User model with authentication
+│   └── user_test.go     # User model unit tests
 ├── routes/              # Route handlers
 │   ├── events.go        # Event-related route handlers
+│   ├── events_test.go   # Event route integration tests
 │   ├── users.go         # User authentication route handlers
+│   ├── users_test.go    # User authentication route tests
 │   ├── register.go      # Event registration route handlers
-│   └── routes.go        # Route registration and middleware setup
+│   ├── register_test.go # Event registration route tests
+│   ├── routes.go        # Route registration and middleware setup
+│   └── test_utils.go    # Shared test utilities and helpers
 ├── auth/                # Authentication package
 │   ├── auth.go          # Authentication middleware
 │   ├── hash.go          # Password hashing and validation
@@ -462,7 +515,7 @@ The application uses SQLite with the following tables:
 - [ ] Event filtering and search capabilities
 - [ ] Pagination for large event lists
 - [ ] Input sanitization and advanced validation
-- [ ] Unit and integration tests
+- [x] ~~Unit and integration tests~~ ✅ **Completed**
 - [ ] Docker containerization
 - [ ] API documentation with Swagger
 - [ ] Database migration system
