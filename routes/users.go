@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"REST_API/auth"
 	"REST_API/models"
 	"net/http"
 
@@ -40,5 +41,11 @@ func login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User logged in successfully"})
+	token, err := auth.GenerateToken(user.Email, user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User logged in successfully", "token": token})
 }

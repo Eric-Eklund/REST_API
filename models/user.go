@@ -1,7 +1,7 @@
 package models
 
 import (
-	"REST_API/crypto"
+	"REST_API/auth"
 	"REST_API/db"
 	"errors"
 )
@@ -20,7 +20,7 @@ func (u *User) Save() error {
 	}
 	defer func() { _ = stmt.Close() }()
 
-	hashedPassword, err := crypto.HashPassword(u.Password)
+	hashedPassword, err := auth.HashPassword(u.Password)
 	if err != nil {
 		return err
 	}
@@ -37,16 +37,16 @@ func (u *User) Save() error {
 }
 
 func (u *User) ValidateCredentials() error {
-	query := "SELECT password FROM users WHERE email = ?"
+	query := "SELECT id, password FROM users WHERE email = ?"
 	row := db.DB.QueryRow(query, u.Email)
 
 	var retrievedPassword string
-	err := row.Scan(&retrievedPassword)
+	err := row.Scan(&u.ID, &retrievedPassword)
 	if err != nil {
 		return errors.New("invalid credentials")
 	}
 
-	passwordIsWalid := crypto.CheckPasswordHash(u.Password, retrievedPassword)
+	passwordIsWalid := auth.CheckPasswordHash(u.Password, retrievedPassword)
 
 	if !passwordIsWalid {
 		return errors.New("invalid credentials")

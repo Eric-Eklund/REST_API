@@ -33,16 +33,15 @@ func getEventByID(c *gin.Context) {
 }
 
 func createEvent(c *gin.Context) {
-	var event models.Event
 
+	var event models.Event
 	err := c.ShouldBindJSON(&event)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid event data"})
 		return
 	}
 
-	event.ID = 1
-	event.UserID = 1337
+	event.UserID = c.GetInt64("userId")
 	err = event.Save()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Event could not be created"})
@@ -59,9 +58,15 @@ func updateEvents(c *gin.Context) {
 		return
 	}
 
-	_, err = models.GetEventByID(id)
+	userIds := c.GetInt64("userId")
+	event, err := models.GetEventByID(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Event not found"})
+		return
+	}
+
+	if event.UserID != userIds {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
@@ -89,8 +94,14 @@ func deleteEvent(c *gin.Context) {
 		return
 	}
 
+	userIds := c.GetInt64("userId")
 	event, err := models.GetEventByID(id)
 	if err != nil {
+		return
+	}
+
+	if event.UserID != userIds {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 

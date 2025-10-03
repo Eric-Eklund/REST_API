@@ -1,1 +1,2 @@
-DELETE http://localhost:8080/events/9
+DELETE http://localhost:8080/events/5
+Authorization: YOUR_JWT_TOKEN_HERE
